@@ -4,13 +4,30 @@ Basic command line for a quick start with Docker.
 
 I personally recommend to use the [Docker VSCode extension](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-docker). It allows to do the same of the following work, but whit a gui.
 
-## Docker Basics
+# Docker Basics
+
+### __Get a new image__
+
+```bash
+docker pull <image_name:image_tag>
+#Example:
+docker pull ubuntu:latest
+```
+
 
 ### __Docker File Template__
+
+To automate the process or image creation, updating and installing the packages, exit the `Dockerfiles`.
+
+See the following example and then are some examples of how to exec this script.
+
+More info: [Dockerfile Reference](https://docs.docker.com/engine/reference/builder/)
 
 ```bash
 # Select the image source
 FROM ubuntu:18.04
+
+MAINTAINER: <name> <email>
 
 # Update the image and install the 
 # required software:
@@ -19,11 +36,17 @@ apt update && apt upgrade -y &&\
 apt install -y build-essential &&\
 apt install -y net-tools
 
+# To add file from host
+ADD <local_file> /<path_docker>/
+
 # If you need to copy some file to the image:
 COPY my_input.txt /home
 
 # Expose ports
 EXPOSE 80
+
+# Define Variables
+ENV VAR=var 
 
 # Define default command
 CMD ["bash"]
@@ -84,27 +107,39 @@ docker container run -dit --name <name_new_container> <name_base_image>
 * `<name_new_container>`: Name of the new container created
 * `<name_base_image>`: Name of the image used to create the container 
 
-### __To Exec the Bash of Container Previously Created and Started__
+### __Create an Image from a Container__
+
+If you have a container with some specific setup or packages installed it's possible to generate a image to use it in future container creations:
+
+```bash
+docker commit <container_id> <new_image_name:new_image_tag>
+```
+
+# Exec a Container
 
 __Important:__ The `<name>` has to be the name of the container (or the container id) but not the name of the image
 
-```bash
-docker exec -it <name>  bash
-```
-
-### __To Start a Container & Execute Bash__
+### __Start/Stop a Container__
 
 ```bash
+# Start
 docker container start <name> 
-docker exec -it <name> bash
-```
-
-### __Stop a Container__
-```bash
+# Stop
 docker container stop <name>
+docker container kill <name> #Similar to previous
 ```
 
-### __To Check Containers__
+### __Run Container Pre. Created and Started__
+
+```bash
+# Add process (bash in this case) to a running container:
+docker exec -it <name>  bash
+
+# The next command just reattach a running container:
+docker attach <name>
+```
+
+### __To Check Status/Manage Containers__
 
 ```bash
 # Containers running
@@ -115,6 +150,18 @@ docker container ps -a
 
 # List all the images:
 docker images
+
+# To check possible errors:
+docker logs <name>
+
+# Remove container
+docker rm <name>
+
+# To save an image:
+docker save -o <backup_name>.tar.gz <image_name:tag>
+
+# To load a previously saved image:
+docker load <backup_name>.tar.gz
 ```
 
 ## Docker Networking Basics
@@ -133,7 +180,18 @@ Default Networks:
     - It's need a port redirection file/table to access the containers
     - `--network=bridge`
 
+It's also possible to create private networks inside docker (it's create a network device):
+```bash
+docker network create <my_docker_network>
+```
+And then connect any container to the created network:
+```bash
+docker run -ti --net <my_docker_network> --name <new_container_name> bash
+```
+It's possible to use `ping <container_name>` to test connections between containers.
+
 __Warning__: ["Unlike Docker on Linux, Docker-for-Mac does not expose container networks directly on the macOS host."](https://github.com/chipmk/docker-mac-net-connect)
+
 ### Docker Network None
 
 ```bash
@@ -174,9 +232,7 @@ ifconfig # Now appears `eth0`, `docker0`, `services1`
 
 ```
 
-## Docker Compose
-
-### Create links
+### Create links (legacy)
 
 To link manually to containers:
 
@@ -188,9 +244,9 @@ To link manually to containers:
 docker run --name <container_1> -p 8080:80 -p 8443:443 --link <image_b:container_2> <image_a:container_0>
 ```
 
-To automate and escalate the previous task, it's better to use `Docker Compose (docker-compose.yml)`
+# Docker Compose
 
-### Docker Compose
+To automate and escalate previous task, it's better to use `Docker Compose (docker-compose.yml)`
 
 To run `docker-compose.yml`
 
