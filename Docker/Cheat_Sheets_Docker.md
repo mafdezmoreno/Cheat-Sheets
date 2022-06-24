@@ -4,6 +4,8 @@ Basic command line for a quick start with Docker.
 
 I personally recommend to use the [Docker VSCode extension](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-docker). It allows to do the same of the following work, but whit a gui.
 
+## Docker Basics
+
 ### __Docker File Template__
 
 ```bash
@@ -113,4 +115,64 @@ docker container ps -a
 
 # List all the images:
 docker images
+```
+
+## Docker Compose
+
+### Create links
+
+To link manually to containers:
+
+* `<container_1>` New container to be created
+* `<image_a:latest>` Image Base for new container
+* `<image_b:container_2>` Container to be linked
+
+```bash
+docker run --name <container_1> -p 8080:80 -p 8443:443 --link <image_b:container_2> <image_a:container_0>
+```
+
+To automate and escalate the previous task, it's better to use `Docker Compose (docker-compose.yml)`
+
+### Docker Compose
+
+To run `docker-compose.yml`
+
+```bash
+docker-compose up
+# or specifying a concrete file:
+docker-compose -f my-compose.yml up
+
+```
+
+__File Format (example-template)__
+
+```yml
+version "3.3" # The last version
+
+services: 
+    <container_name_1>: #Contents all the instructions
+        image: <image_name:image_tag> # Name of the image
+        volumes: 
+            - <container_name_1_data>: /var/lib/ # Path to volume (in host)
+        restart: always
+        links:
+            - <container_name_2>
+        environment:
+            ENV_VAR_1: env_var_1
+
+    <container_name_2>:
+        depend_on:  # Automatically creates a network
+            - <container_name_1>
+        image: <image_name_2:image_tag_2> # Name of the image
+        volumes:
+            - <container_name_2_data>: /home/ # Path to host volume (in host)
+        ports:
+            - 8000:80
+        restart: always
+        environment:
+            ENV_VAR_2: env_var_2
+
+volumes:
+    <container_name_1_data>{}
+    <container_name_2_data>{}
 ```
