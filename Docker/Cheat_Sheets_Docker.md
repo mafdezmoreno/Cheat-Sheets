@@ -117,6 +117,63 @@ docker container ps -a
 docker images
 ```
 
+## Docker Networking Basics
+
+Default Networks:
+- none:
+    - Container no IP
+    - `--network=none`
+- host:
+    - Container attached to host IP
+    - Container need a port to be accessed
+    - `--network=host`
+- bridge:
+    - Created by docker by default
+    - Local internal network in docker
+    - It's need a port redirection file/table to access the containers
+    - `--network=bridge`
+
+__Warning__: ["Unlike Docker on Linux, Docker-for-Mac does not expose container networks directly on the macOS host."](https://github.com/chipmk/docker-mac-net-connect)
+### Docker Network None
+
+```bash
+docker container run -dit --name <name_new_container> --network none <name_image_base>
+# Example:
+docker container run -dit --name cont_1 --network none ub_1804_cpp
+# To test the container:
+docker container exec -it cont_1 bash
+ifconfig #Return only 'lo' config
+```
+### Docker Network Bridge
+
+Bridge is the default configuration, so it's optional to include `--network bridge`
+
+```bash
+docker container run -dit --name <name_new_container>  -p 8888:80 --network bridge <name_image_base>
+
+# Example:
+docker container run -dit --name cont_2 -p 8888:80 --network bridge ub_1804_cpp
+
+# To test the container
+docker container exec -it cont_2 bash  
+ifconfig # Now appears `eth0` config    
+
+```
+
+### Docker Network Host
+
+```bash
+docker container run -dit --name <name_new_container> --network host <name_image_base>
+
+# Example:
+docker container run -dit --name cont_3 --network host ub_1804_cpp
+
+# To test the container
+docker container exec -it cont_3 bash  
+ifconfig # Now appears `eth0`, `docker0`, `services1`    
+
+```
+
 ## Docker Compose
 
 ### Create links
