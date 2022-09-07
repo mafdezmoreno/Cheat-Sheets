@@ -6,6 +6,6 @@ Programming languages cheat sheet.
 
 # Contents:
 
-1. Docker CLI
+1. [Docker CLI](/Docker/Cheat_Sheets_Docker.md)
 
-2. ssh Connection guide
+2. [ssh Connection guide](/ssh/ssh_setup.md)
