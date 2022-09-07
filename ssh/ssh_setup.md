@@ -62,6 +62,20 @@ ssh-copy-id <user_server>@<hostname_server>
 
 The VSCode extension "Remote-SSH (microsoft) facilitates a lot the process and the access to the server files.
 
+To disable GUI (start machine directly to terminal)
+```
+sudo systemctl set-default multi-user
+```
+To disable autologin (activated by default in virtual machines) commnets autologin config in:
+```
+#ubuntu
+sudo vim /etc/gdm/custom.conf
+```
+```
+#xubuntu
+sudo vim /etc/lightdm/lightdm.conf
+```
+
 ## References
 
 https://www.youtube.com/watch?v=5Fcf-8LPvws
